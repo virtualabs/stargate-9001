@@ -1,4 +1,5 @@
-# StarGate 9001 (Goolsky SG901 hardware/software reverse-engineering Project)
+StarGate 9001 (Goolsky SG901 hardware/software reverse-engineering Project)
+===========================================================================
 
 ## Hardware reverse-engineering
 
