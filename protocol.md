@@ -54,10 +54,33 @@ FC 00:
 ....
 
 
-# Binding (channel 0)
+# Binding process (channel 0)
 
-> TX transmits 00 AA 40 07 00 00 00 00 00 00 00 00 00 00 00 00 (channel 0)
-< RX transmits 00 BB 40 07 93 89 00 00 00 00 00 00 00 00 00 00 (channel 0)
-> TX transmits 93 00 89 0A 44 4E 4C 45 00 00 40 44 A5 4E 40 07 (channel 0)
+First, the remote controller sends an advertising packet on channel 0:
+
+  00 AA 40 07 00 00 00 00 00 00 00 00 00 00 00 00
+
+The drone answers back with its own ID (0x93) in a packet on channel 0:
+
+  00 BB 40 07 93 89 00 00 00 00 00 00 00 00 00 00
+
+Last, the remote controller sends a synchronization packet on channel 0, containing the channel hopping sequence (0x44, 0x4E, 0x4C, 0x45)
+
+  93 00 89 0A 44 4E 4C 45 00 00 40 44 A5 4E 40 07
+
+Once the binding performed, the remote controller keeps sending orders on these channels.
+
+
+# Channel hopping mechanism
+
+The remote controller loops over 4 channels, 6ms/channel (~24ms/cycle), and each packet sent over a channel specifies the next channel
+used in the hopping sequence:
+
+```
+93 4e 89 0a 80 80 80 08 14 44 60 e0 44 f5 4a 91
+   ^
+   next channel
+```
+
 
 
