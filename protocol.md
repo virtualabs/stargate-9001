@@ -63,3 +63,20 @@ Offset Example value Description
 +0x0D  0x55          8-bit checksum (see reversed algorithm)
 +0x0E  0x40          controller ID bits 0-7
 +0x0F  0x07          controller ID bits 8-15
+
+
+CRC algorithm
+-------------
+
+``` python
+def checksum(pkt):
+  """
+  Checksum is computed on the first 13 bytes
+  """
+  _pkt = list(pkt)
+  _pkt[3] = 0x0a
+  cs = 0xdc
+  for b in _pkt:
+    cs = (cs + b)&0xff
+  return cs
+```
