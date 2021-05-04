@@ -45,24 +45,24 @@ The packet contains the following information:
 * the controller and drone IDs
 
 
-Offset Example value Description
-====== ============= ==========================================================
-+0x00  0x93          drone ID, bits 0-7
-+0x01  0x4e          Next channel
-+0x02  0x89          drone ID, bits 8-15
-+0x03  0x0a          flags (role unknown)
-+0x04  0x01          throttle (0x00 to 0xff)
-+0x05  0x80          roll (bit 7 set to 1 indicates a positive value)
-+0x06  0x80          pitch (bit 7 set to 1 indicates a positive value)
-+0x07  0x80          yaw (bit 7 set to 1 indicates a positive value)
-+0x08  0x00          auto take-off/landing, set to 0x40 if enabled
-+0x09  0x00          unknown
-+0x0A  0x40          unknown
-+0x0B  0x44          unknown
-+0x0C  0x00          current selected speed (0x00: 40%, 0x01:75%, 0x02:100%)
-+0x0D  0x55          8-bit checksum (see reversed algorithm)
-+0x0E  0x40          controller ID bits 0-7
-+0x0F  0x07          controller ID bits 8-15
+| Offset | Example value | Description                                                 |
+|--------|---------------|-------------------------------------------------------------|
+| +0x00  | 0x93          | drone ID, bits 0-7                                          |
+| +0x01  | 0x4e          | Next channel                                                |
+| +0x02  | 0x89          | drone ID, bits 8-15                                         |
+| +0x03  | 0x0a          | flags (role unknown)                                        |
+| +0x04  | 0x01          | throttle (0x00 to 0xff)                                     |
+| +0x05  | 0x80          | roll (bit 7 set to 1 indicates a positive value)            |
+| +0x06  | 0x80          | pitch (bit 7 set to 1 indicates a positive value)           |
+| +0x07  | 0x80          | yaw (bit 7 set to 1 indicates a positive value)             |
+| +0x08  | 0x00          | auto take-off/landing, set to 0x40 if enabled               |
+| +0x09  | 0x00          | unknown                                                     |
+| +0x0A  | 0x40          | unknown                                                     |
+| +0x0B  | 0x44          | unknown                                                     |
+| +0x0C  | 0x00          | current selected speed (0x00: 40%, 0x01:75%, 0x02:100%)     |
+| +0x0D  | 0x55          | 8-bit checksum (see reversed algorithm)                     |
+| +0x0E  | 0x40          | controller ID bits 0-7                                      |
+| +0x0F  | 0x07          | controller ID bits 8-15                                     |
 
 
 CRC algorithm
