@@ -1,64 +1,14 @@
-# Reset XN297L
-FC 00: CE_FSPI_OFF
-53 5A: RST_FSPI_HOLD 
-53 A5: RST_FSPI_RELS
+SG901 RF protocol
+=================
 
-# Configuration
-22 01: Enable data pipe 0 (EN_RXADDR)
-23 03: Set address length to 5 bytes (SETUP_AW)
-31 10: Set RX payload size to 16 bytes (RX_PW_P0)
-30 CC CC CC CC CC: Set Transmit Address to CC:CC:CC:CC:CC (TX_ADDR)
-2A CC CC CC CC CC: Set PIPE0 RX Address to CC:CC:CC:CC:CC (RX_ADDR_P0)
-3C 00: Set static packet length (DYNPD)
-26 3F: Set bitrate to 1Mbps (RF_SETUP)
-24 00: Disable retransmit (SETUP_RETR)
-21 00: Set no auto-ack (EN_AA)
+Binding process
+---------------
 
-# Calibration data
-3F 0A 6D 67 9C 46: Set BB_CAL (calibration)
-3E F6 37 5D:  Set RF_CAL  (calibration)
-3A 45 21 EF 2C 5A 5C: Set RF_CAL2 (calibration)
-39 01: Set DEMOD_CAL  (calibration)
-3B 0B DF 02: Set DEM_CAL2 (calibration)
-
-FC 00: CE_FSPI_OFF
-20 0E: Enable CRC, 2-byte CRC, PTX mode ON (transmit)
-00 0E: Read CONFIG register (0x0E returned)
-27 70: Clear RX_DR, TX_DS, MAX_RT (STATUS)
-25 00: Set RF_CH to 0 (Channel: 0)
-FC 00: CE_FSPI_OFF
-20 8E: Enter STB3 (Standby-III mode)
-FD 00: CE_FSPI_ON
-A0 00 AA 40 07 00 00 00 00 00 00 00 00 00 00 00 00: Transmit payload 00 AA 40 07 00 ... 00 <16 bytes>
-FD 00: CE_FSPI_ON
-
-# Wait 1s
-
-FC 00: CE_FSPI_OFF
-
-
-FC 00: CE_FSPI_OFF
-20 0E: Enable CRC, 2-byte CRC, PTX mode ON (transmit)
-00 0E: Read CONFIG register (0x0E returned)
-27 70: Clear RX_DR, TX_DS, MAX_RT (STATUS)
-25 00: Set RF_CH to 0 (Channel: 0)
-FC 00: CE_FSPI_OFF
-20 8E: Enter STB3 (Standby-III mode)
-FD 00: CE_FSPI_ON
-A0 00 AA 40 07 00 00 00 00 00 00 00 00 00 00 00 00: Transmit payload 00 AA 40 07 00 ... 00 <16 bytes>
-FD 00: CE_FSPI_ON
-
-FC 00:
-
-
-....
-
-
-# Binding process (channel 0)
-
-First, the remote controller sends an advertising packet on channel 0:
+Binding is performed on channel 0, the controller send the following packet:
 
   00 AA 40 07 00 00 00 00 00 00 00 00 00 00 00 00
+
+0x4007 is supposed to be the controller ID.
 
 The drone answers back with its own ID (0x93) in a packet on channel 0:
 
@@ -71,7 +21,8 @@ Last, the remote controller sends a synchronization packet on channel 0, contain
 Once the binding performed, the remote controller keeps sending orders on these channels.
 
 
-# Channel hopping mechanism
+Channel hopping mechanism
+-------------------------
 
 The remote controller loops over 4 channels, 6ms/channel (~24ms/cycle), and each packet sent over a channel specifies the next channel
 used in the hopping sequence:
@@ -82,5 +33,33 @@ used in the hopping sequence:
    next channel
 ```
 
+Data packet format
+------------------
+
+The packet contains the following information:
+
+* throttle, roll, pitch and yaw stick positions
+* the current selected speed
+* the state of various buttons
+* a 8-bit CRC
+* the controller and drone IDs
 
 
+Offset Example value Description
+====== ============= ==========================================================
++0x00  0x93          drone ID, bits 0-7
++0x01  0x4e          Next channel
++0x02  0x89          drone ID, bits 8-15
++0x03  0x0a          flags (role unknown)
++0x04  0x01          throttle (0x00 to 0xff)
++0x05  0x80          roll (bit 7 set to 1 indicates a positive value)
++0x06  0x80          pitch (bit 7 set to 1 indicates a positive value)
++0x07  0x80          yaw (bit 7 set to 1 indicates a positive value)
++0x08  0x00          auto take-off/landing, set to 0x40 if enabled
++0x09  0x00          unknown
++0x0A  0x40          unknown
++0x0B  0x44          unknown
++0x0C  0x00          current selected speed (0x00: 40%, 0x01:75%, 0x02:100%)
++0x0D  0x55          8-bit checksum (see reversed algorithm)
++0x0E  0x40          controller ID bits 0-7
++0x0F  0x07          controller ID bits 8-15
