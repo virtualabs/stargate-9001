@@ -4,15 +4,20 @@ from microbit import *
 
 def checksum(pkt):
   _pkt = list(pkt)
-  _pkt[3] = 0x0a
-  cs = 0xdc
+  _pkt[3] = 0x0
+  cs = 0xe6
   for b in _pkt:
-    cs = (cs + b)&0xff
-  return cs
+    cs = (cs + b)
+  return (((cs>>8)<<2)-6, cs&0xff)
+
+def disp_pkt2(p):
+  print(''.join(['%02x' % c for c in p]))
 
 def disp_pkt(p):
-  crc = checksum(pkt[:13])
-  crc_valid = (crc==pkt[13])
+  crc1 = pkt[3]
+  crc2 = pkt[13]
+  crc1_,crc2_ = checksum(pkt[:13])
+  crc_valid = ((crc1==crc1_) and (crc2==crc2_))
   t,r,p,y = p[4:8]
   if r&0x80:
     r = r&0x7f
