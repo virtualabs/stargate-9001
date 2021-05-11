@@ -50,7 +50,7 @@ The packet contains the following information:
 | +0x00  | 0x93          | drone ID, bits 0-7                                          |
 | +0x01  | 0x4e          | Next channel                                                |
 | +0x02  | 0x89          | drone ID, bits 8-15                                         |
-| +0x03  | 0x0a          | flags (role unknown)                                        |
+| +0x03  | 0x0a          | checksum (bits 8-15)                                        |
 | +0x04  | 0x01          | throttle (0x00 to 0xff)                                     |
 | +0x05  | 0x80          | roll (bit 7 set to 1 indicates a positive value)            |
 | +0x06  | 0x80          | pitch (bit 7 set to 1 indicates a positive value)           |
@@ -70,13 +70,10 @@ CRC algorithm
 
 ``` python
 def checksum(pkt):
-  """
-  Checksum is computed on the first 13 bytes
-  """
   _pkt = list(pkt)
-  _pkt[3] = 0x0a
-  cs = 0xdc
+  _pkt[3] = 0x0
+  cs = 0xe6
   for b in _pkt:
-    cs = (cs + b)&0xff
-  return cs
+    cs = (cs + b)
+  return (((cs>>8)<<2)-6, cs&0xff)
 ```
